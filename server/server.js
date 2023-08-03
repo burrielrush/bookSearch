@@ -7,9 +7,6 @@ const routes = require('./routes');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
 // Import your GraphQL type definitions and resolvers here
 const typeDefs = `
   type Query {
@@ -30,7 +27,15 @@ const server = new ApolloServer({
 });
 
 // Apply Apollo Server as middleware to Express
-server.applyMiddleware({ app });
+async function startApolloServer() {
+  await server.start();
+  server.applyMiddleware({ app });
+}
+
+startApolloServer();
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // if we're in production, serve client/build as static assets
 if (process.env.NODE_ENV === 'production') {
